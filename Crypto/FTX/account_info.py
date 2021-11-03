@@ -9,8 +9,8 @@ from requests import Request
 import tkinter
 from datetime import datetime
 
-apiKey = "dQp9kz1pAqNRVwWuPIjSXtbn3sXyL_FSaovy4hVE"
-secret = "Q2Vp_6epQ5rezSBZJcMq-CGZCC_y94DgbgTgNDrI"
+apiKey = ""
+secret = ""
 
 exchange = ccxt.ftx({'apiKey': apiKey, 'secret': secret, 'enableRateLimit': True})
 
