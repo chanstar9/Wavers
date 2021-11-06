@@ -48,3 +48,21 @@ def find_ICO():
         return 0
 
     return coin_names
+
+def coin_order(ticker, ratio, side = "buy", order_type = "market"):
+    my_usd = exchange.fetch_balance()['free']['USD'] * ratio
+    coin_last_price = exchange.fetch_ticker(ticker + "/USD")['close']
+    trading_amount = my_usd/coin_last_price
+    mkt_order = exchange.create_order(ticker, "market", side, trading_amount)
+    
+def exchange_arbitrage_strategy():
+    ICO_coin_list = find_ICO()
+    for coin in range(ICO_coin_list):
+        coin_order(coin, 1/len(ICO_coin_list))        
+        
+
+if __name__ == '__main__':
+    schedule.every().hour.at(":00").do(exchange_arbitrage_strategy)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
