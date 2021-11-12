@@ -47,7 +47,7 @@ def bs_rho(s, k, tow, r, q, vol, position, cp=1):
 
 def bs_vanna(s, k, tow, r, q, vol, position):
     d1 = d_1(s, k, tow, r, q, vol)
-    return position * (np.sqrt(tow) * norm.pdf(d1) * (1 - d1))
+    return position * (np.sqrt(tow) * np.exp(-(d1 ** 2) / 2) * (1 - d1) / (2 * np.pi))
 
 
 def IV(s, k, tow, r, q, mkt_price, cp=1):
