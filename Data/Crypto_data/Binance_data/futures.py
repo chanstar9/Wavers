@@ -64,7 +64,9 @@ def on_message_fut(ws, message):
         Futures_DB.insert_one(fut_tick)
         print(fut_tick)
 
-
+def on_close(ws, close_status_code, close_msg):
+    futures_data(Binance_ticker_list)
+        
 def futures_data(coin_ticker_list):
     stream_name = ['aggTrade', 'bookTicker', 'depth5@100ms']
     request_list = ''
@@ -78,4 +80,4 @@ def futures_data(coin_ticker_list):
 
 
 if __name__ == '__main__':
-    futures_data(Binance_ticker_list[:3])
+    futures_data(Binance_ticker_list)
