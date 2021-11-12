@@ -51,6 +51,8 @@ def on_message_spot(ws, message):
         Spot_DB.insert_one(spot_tick)
         print(spot_tick)
 
+def on_close(ws, close_status_code, close_msg):
+    spot_data(Binance_ticker_list)
 
 def spot_data(coin_ticker_list):
     stream_name = ['aggTrade', 'depth@100ms']
@@ -65,4 +67,4 @@ def spot_data(coin_ticker_list):
 
 
 if __name__ == '__main__':
-    spot_data(Binance_ticker_list[:3])
+    spot_data(Binance_ticker_list)
