@@ -6,7 +6,7 @@ from scipy.interpolate import CubicSpline
 from Data.Crypto_data.Deribit_data.Deribit_API import find_data_MongoDB
 
 
-def ATM_vol_term(df: pd.DataFrame, tolerance=0.09):
+def ATM_vol_term(df: pd.DataFrame, currency='BTC', tolerance=0.09):
     df[MONEYNESS] = df.apply(lambda x: np.log(x[UNDER_P] / x[STRIKE]), axis=1)
     df.sort_values(by=[MONEYNESS, TTM], inplace=True)  # 0.01
     df_ATM = df[abs(df[MONEYNESS]) <= tolerance].sort_values(by=[TTM]).groupby(by=[TTM]).mean()
@@ -14,7 +14,9 @@ def ATM_vol_term(df: pd.DataFrame, tolerance=0.09):
     x = df_ATM.index
     cx = CubicSpline(x=x, y=df_ATM[VOL])
     plt.plot(x, cx(x))
-    return df_ATM
+    plt.savefig('Image_greeks/{}_ATM_TERMSTRUCTURE'.format(currency))
+    plt.close()
+    return df_ATM[VOL]
 
 
 if __name__ == '__main__':
