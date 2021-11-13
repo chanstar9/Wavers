@@ -55,6 +55,10 @@ INSTRUMENT_NAME = 'instrument_name'
 STRIKE = 'Strike'
 MONEYNESS = 'Moneyness'
 
+#Greeks
+GAMMA = 'gamma'
+VANNA = 'vanna'
+
 # 호가
 BID_1P = '1st_bid_price'
 BID_1A = '1st_bid_amount'
