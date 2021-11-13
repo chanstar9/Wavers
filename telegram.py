@@ -15,8 +15,8 @@ def telegram_greeks(number: str, greek: str, folder_name='Image_greeks'):
     loc_image = '{2}/{0}_{1}.png'.format(number, greek, folder_name)
 
     import telegram
-    telegram_token = "2127372056:AAE_jOAJk56yi2pQ2nf-imR9ZpfSJQFVSQs"
-    telegram_chat_id = 2108391035
+    telegram_token = "add your token"
+    telegram_chat_id = 000000000
     bot = telegram.Bot(token=telegram_token)
     bot.send_photo(chat_id=telegram_chat_id, photo=open(loc_image, 'rb'))
 
