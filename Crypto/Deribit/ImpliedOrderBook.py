@@ -20,7 +20,8 @@ def arrange_x(x, number_cut):
     return result
 
 
-def gamma_by_strikes(df, graph=True, title=None, number_cut=3):
+def gamma_by_strikes(df, number='BTC500', graph=True, title=None, number_cut=3):
+    #df = btc_df
     r, q = (0, 0)
 
     # filter
@@ -35,16 +36,20 @@ def gamma_by_strikes(df, graph=True, title=None, number_cut=3):
 
     if graph:
         x = np.arange(len(df))
+        plt.rc('font', size=5)
         plt.bar(x, df.values)
         plt.xticks(x, df.index, rotation=90)
         plt.title(title)
-        plt.show()
+        plt.savefig('Image_greeks/{}_gamma'.format(number))
+        plt.close()
     return df
 
 
 def mkt_greeks(df, spot, vol, greeks):
     r, q = (0, 0)
-
+    # df = btc_df
+    # spot = 69000
+    # vol = 0.8
     # filter
     df = df[df[TTM] > 7 / 365]  # except daily and weekly option
     df = df[df[VOL] > 0.001]
@@ -57,6 +62,36 @@ def mkt_greeks(df, spot, vol, greeks):
         df[VANNA] = df.apply(lambda x: bs_vanna(spot, x[STRIKE], x[TTM], r, q, vol, 1), axis=1)
         df[VANNA] = df.apply(lambda x: x[VANNA] * x[OI] if x[CP] == 'C' else -x[VANNA] * x[OI], axis=1)
         return df[VANNA].sum() * spot
+
+
+def GEX(df, spot, vol, number, graph=True, title=None):
+    spot_lst = np.round(spot * np.arange(0.8, 1.15, 0.01))
+
+    GEX = [mkt_greeks(df, s, vol / 100, greeks=GAMMA) for s in spot_lst]
+    df_GEX = pd.DataFrame(data=GEX, index=spot_lst)
+    if graph:
+        x = np.arange(len(df_GEX))
+        plt.rc('font', size=5)
+        plt.bar(x, df_GEX.values[:,0])
+        plt.xticks(x, df_GEX.index, rotation=90)
+        plt.title(title)
+        plt.savefig('Image_greeks/{}_GEX'.format(number))
+        plt.close()
+
+
+def VEX(df, spot, vol, number, graph=True, title=None):
+    vol_lst = np.round(vol * np.arange(0.7, 1.3, 0.01))
+
+    VEX = [mkt_greeks(df, spot, v / 100, greeks=VANNA) for v in vol_lst]
+    df_VEX = pd.DataFrame(data=VEX, index=vol_lst)
+    if graph:
+        x = np.arange(len(df_VEX))
+        plt.rc('font', size=5)
+        plt.bar(x, df_VEX.values[:,0])
+        plt.xticks(x, df_VEX.index, rotation=90)
+        plt.title(title)
+        plt.savefig('Image_greeks/{}_VEX'.format(number))
+        plt.close()
 
 
 def heatmap_maker(df, spot, vol):
@@ -89,8 +124,8 @@ if __name__ == '__main__':
     eth_df = find_data_MongoDB(number='ETH{}'.format(num))
 
     # 가져온 데이터에 대한 Mkt_gamma
-    BTC_gammas = gamma_by_strikes(btc_df, graph=True, title='BTC mkt gamma(num: {})'.format(num), number_cut=3)
-    ETH_gammas = gamma_by_strikes(eth_df, graph=True, title='ETH mkt gamma(num: {})'.format(num), number_cut=2)
+    BTC_gammas = gamma_by_strikes(btc_df, number='BTC{}'.format(num), graph=True, title='BTC mkt gamma(num: {})'.format(num), number_cut=3)
+    ETH_gammas = gamma_by_strikes(eth_df, number='ETH{}'.format(num), graph=True, title='ETH mkt gamma(num: {})'.format(num), number_cut=2)
 
     # GEX+
     btc_df.dropna(subset=[OI], inplace=True)
