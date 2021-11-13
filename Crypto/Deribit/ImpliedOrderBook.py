@@ -4,7 +4,6 @@
 :Date: 2021. 08. 11
 """
 from tqdm import tqdm
-import datetime as dt
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -13,6 +12,8 @@ from columns import *
 from bs_formula import *
 from Data.Crypto_data.Deribit_data.Deribit_API import find_data_MongoDB
 
+r, q = (0, 0)
+
 
 def arrange_x(x, number_cut):
     digit = len(str(int(x)))
@@ -20,12 +21,9 @@ def arrange_x(x, number_cut):
     return result
 
 
-def gamma_by_strikes(df, number='BTC500', graph=True, title=None, number_cut=3):
-    #df = btc_df
-    r, q = (0, 0)
-
+def gamma_by_strikes(df, number, graph=True, title=None, number_cut=3):
     # filter
-    df = df[df[TTM] > 10 / 365]
+    df = df[df[TTM] > 7 / 365]
     df = df[df[VOL] > 0.001]
     df.dropna(subset=[OI], inplace=True)
     df[GAMMA] = df.apply(lambda x: bs_gamma(x[UNDER_P], x[STRIKE], x[TTM], r, q, x[VOL], 1), axis=1)
@@ -46,10 +44,6 @@ def gamma_by_strikes(df, number='BTC500', graph=True, title=None, number_cut=3):
 
 
 def mkt_greeks(df, spot, vol, greeks):
-    r, q = (0, 0)
-    # df = btc_df
-    # spot = 69000
-    # vol = 0.8
     # filter
     df = df[df[TTM] > 7 / 365]  # except daily and weekly option
     df = df[df[VOL] > 0.001]
@@ -67,12 +61,12 @@ def mkt_greeks(df, spot, vol, greeks):
 def GEX(df, spot, vol, number, graph=True, title=None):
     spot_lst = np.round(spot * np.arange(0.8, 1.15, 0.01))
 
-    GEX = [mkt_greeks(df, s, vol / 100, greeks=GAMMA) for s in spot_lst]
-    df_GEX = pd.DataFrame(data=GEX, index=spot_lst)
+    GEX_values = [mkt_greeks(df, s, vol / 100, greeks=GAMMA) for s in spot_lst]
+    df_GEX = pd.DataFrame(data=GEX_values, index=spot_lst)
     if graph:
         x = np.arange(len(df_GEX))
         plt.rc('font', size=5)
-        plt.bar(x, df_GEX.values[:,0])
+        plt.bar(x, df_GEX.values[:, 0])
         plt.xticks(x, df_GEX.index, rotation=90)
         plt.title(title)
         plt.savefig('Image_greeks/{}_GEX'.format(number))
@@ -82,12 +76,12 @@ def GEX(df, spot, vol, number, graph=True, title=None):
 def VEX(df, spot, vol, number, graph=True, title=None):
     vol_lst = np.round(vol * np.arange(0.7, 1.3, 0.01))
 
-    VEX = [mkt_greeks(df, spot, v / 100, greeks=VANNA) for v in vol_lst]
-    df_VEX = pd.DataFrame(data=VEX, index=vol_lst)
+    VEX_values = [mkt_greeks(df, spot, v / 100, greeks=VANNA) for v in vol_lst]
+    df_VEX = pd.DataFrame(data=VEX_values, index=vol_lst)
     if graph:
         x = np.arange(len(df_VEX))
         plt.rc('font', size=5)
-        plt.bar(x, df_VEX.values[:,0])
+        plt.bar(x, df_VEX.values[:, 0])
         plt.xticks(x, df_VEX.index, rotation=90)
         plt.title(title)
         plt.savefig('Image_greeks/{}_VEX'.format(number))
@@ -113,7 +107,6 @@ def heatmap_maker(df, spot, vol):
     ax.set_title("GEX+ map, spot: {}, vol: {}".format(spot, vol))
     ax.set_xlabel("Implied Volatility")
     ax.set_ylabel("Spot")
-    ax.axvline("")
     plt.show()
 
 
@@ -124,8 +117,10 @@ if __name__ == '__main__':
     eth_df = find_data_MongoDB(number='ETH{}'.format(num))
 
     # 가져온 데이터에 대한 Mkt_gamma
-    BTC_gammas = gamma_by_strikes(btc_df, number='BTC{}'.format(num), graph=True, title='BTC mkt gamma(num: {})'.format(num), number_cut=3)
-    ETH_gammas = gamma_by_strikes(eth_df, number='ETH{}'.format(num), graph=True, title='ETH mkt gamma(num: {})'.format(num), number_cut=2)
+    BTC_gammas = gamma_by_strikes(btc_df, number='BTC{}'.format(num), graph=True,
+                                  title='BTC mkt gamma(num: {})'.format(num), number_cut=3)
+    ETH_gammas = gamma_by_strikes(eth_df, number='ETH{}'.format(num), graph=True,
+                                  title='ETH mkt gamma(num: {})'.format(num), number_cut=2)
 
     # GEX+
     btc_df.dropna(subset=[OI], inplace=True)
