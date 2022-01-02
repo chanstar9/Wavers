@@ -14,20 +14,42 @@ TSLA = 'TSLA'
 PLTR = 'PLTR'
 
 # coin ticker
-BTCUSDT = 'BTCUSDT'
 BTC = 'BTC'
-ETHUSDT = 'ETHUSDT'
 ETH = 'ETH'
-XRPUSDT = 'XRPUSDT'
-BNBUSDT = 'BNBUSDT'
-ADAUSDT = 'ADAUSDT'
-SOLUSDT = 'SOLUSDT'
-FTTUSDT = 'FTTUSDT'
-AXSUSDT = 'AXSUSDT'
-LUNAUSDT = 'LUNAUSDT'
-RAYUSDT = 'RAYUSDT'
+XRP = 'XRP'
+BNB = 'BNB'
+ADA = 'ADA'
+FTT = 'FTT'
+RAY = 'RAY'
 
-Binance_ticker_list = [BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT, ADAUSDT, FTTUSDT, AXSUSDT, LUNAUSDT, RAYUSDT]
+# stable ticker
+USD = 'USD'
+USDT = 'USDT'
+USDC = 'USDC'
+
+# layer1
+SOL = 'SOL'
+LUNA = 'LUNA'
+AVAX = 'AVAX'
+FTM = 'FTM'
+ONE = 'ONE'
+NEAR = 'NEAR'
+SCRT = 'SCRT'
+
+# NFT Theme
+AXS = 'AXS'
+SAND = 'SAND'
+MANA = 'MANA'
+GALA = 'GALA'
+
+# ETH 2.0
+MATIC = 'MATIC'
+LRC = 'LRC'
+
+# futures tag
+PERP = 'PERP'
+
+coin_symbol_list = [BTC, ETH, BNB, SOL, ADA, XRP, LUNA, AVAX]
 
 # etc
 ID = '_id'
@@ -40,6 +62,7 @@ HOUR = 'Hour'
 MINUTE = 'Minute'
 TIMESTAMP = 'Timestamp'
 
+#
 UNDERLYING = 'Underlying'
 MAT = 'Maturity'
 TTM = 'Time_to_Maturity'
@@ -54,6 +77,13 @@ UNDER_P = 'Underlying_price'
 INSTRUMENT_NAME = 'instrument_name'
 STRIKE = 'Strike'
 MONEYNESS = 'Moneyness'
+
+# Greeks
+DELTA = 'delta'
+GAMMA = 'gamma'
+VEGA = 'vega'
+THETA = 'theta'
+VANNA = 'vanna'
 
 # 호가
 BID_1P = '1st_bid_price'
