@@ -64,6 +64,23 @@ def get_instruments_resp(currency, kind):
     return tickers
 
 
+def get_index_price_resp(index_name: str):
+    """
+    This function is designed to get 'response' for option data
+    :param instrument_name: Ex) "BTC-1OCT21-44000-P"
+    :return: resp has a 'JSON' type value
+    """
+    msg = \
+        {"jsonrpc": "2.0",
+         "method": "public/get_index_price",
+         "id": 42,
+         "params": {
+             "index_name": index_name}
+         }
+    resp = async_loop(call_api, json.dumps(msg))
+    return resp
+
+
 def get_order_book_resp(instrument_name: str):
     """
     This function is designed to get 'response' for option data
@@ -90,14 +107,14 @@ def get_last_trades_by_instrument_resp(instrument_name: str):
     :return: resp has a 'JSON' type value
     """
     msg = {
-            "jsonrpc": "2.0",
-            "id": 9267,
-            "method": "public/get_last_trades_by_instrument",
-            "params": {
-                "instrument_name": instrument_name,
-                "count": 1
-            }
+        "jsonrpc": "2.0",
+        "id": 9267,
+        "method": "public/get_last_trades_by_instrument",
+        "params": {
+            "instrument_name": instrument_name,
+            "count": 1
         }
+    }
     resp = async_loop(call_api, json.dumps(msg))
     return resp
 
@@ -114,7 +131,8 @@ def json_to_dataframe(json_resp, resp: str):
     elif resp == 'get_instruments':
         df = res['result']
 
-    if df is 0: raise ValueError("There is no such 'resp' value.")
+    if df == 0:
+        raise ValueError("There is no such 'resp' value.")
 
     return df
 
@@ -134,6 +152,12 @@ def check_overlap_NUM(number: str):
     else:
         print('Overlapped.')
         return True
+
+
+def get_index_price(index_name: str):
+    resp = get_index_price_resp(index_name=index_name)
+    btc_spot = json.loads(resp)['result']['index_price']
+    return btc_spot
 
 
 def get_order_book_data(instruments: list, number: str):
@@ -197,6 +221,18 @@ def split_name_info(name: str):
     return info_dict
 
 
+def add_columns(df):
+    '''
+    :param df: DataFrame directly from MongoDB
+    :return: reformed DataFrame which includes maturity, strike and CP columns extracted from NAME.
+    '''
+    df[[MAT, STRIKE, CP]] = df.apply(lambda x: split_name_info(name=x[NAME]),
+                                     axis=1, result_type='expand')
+    df[TTM] = df.apply(lambda x: (x[MAT] -
+                                  datetime.fromtimestamp(x[TIMESTAMP] / 1000)).days / 365, axis=1)
+    return df
+
+
 def insert_data_MongoDB(data):
     ca = certifi.where()
     cluster = MongoClient(
@@ -222,11 +258,8 @@ def find_data_MongoDB(number: str):
     output = [res for res in results]
 
     # Spliting NAME info into columns(Maturity, Strike, CP, Time to Maturity)
-    df = pd.DataFrame(output)
-    df[[MAT, STRIKE, CP]] = df.apply(lambda x: split_name_info(name=x[NAME]),
-                                     axis=1, result_type='expand')
-    df[TTM] = df.apply(lambda x: (x[MAT] -
-                                  datetime.fromtimestamp(x[TIMESTAMP] / 1000)).days / 365, axis=1)
+    df = add_columns(df=pd.DataFrame(output))
+
     return df
 
 
